@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GetInfoTeam\SerializerExtraBundle\Mapping;
 
 use GetInfoTeam\SerializerExtraBundle\Exception\Metadata\InvalidExclusionPolicyException;

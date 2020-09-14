@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GetInfoTeam\SerializerExtraBundle\Exception\Metadata;
 
 use GetInfoTeam\SerializerExtraBundle\Exception\InvalidArgumentException;
