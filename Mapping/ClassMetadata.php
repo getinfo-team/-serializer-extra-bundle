@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GetInfoTeam\SerializerExtraBundle\Mapping;
 
+use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\AttributeNotExistsException;
+use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\DuplicateAttributeNameException;
 use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\InvalidExclusionPolicyException;
 
 class ClassMetadata implements ClassMetadataInterface
@@ -29,8 +31,15 @@ class ClassMetadata implements ClassMetadataInterface
         }
 
         $this->class = $class;
-        $this->properties = $properties;
         $this->exclusionPolicy = $exclusionPolicy;
+
+        foreach ($properties as $property) {
+            if (isset($this->properties[$property->getName()])) {
+                throw new DuplicateAttributeNameException($property->getName());
+            }
+
+            $this->properties[$property->getName()] = $property;
+        }
     }
 
     public function getClass(): string
@@ -41,10 +50,20 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * @inheritDoc
      */
-    public function getProperties(): array
+    public function getAttributes(): array
     {
-        return $this->properties;
+        return array_values($this->properties);
     }
+
+    public function getAttribute(string $name): AttributeMetadataInterface
+    {
+        if (!isset($this->properties[$name])) {
+            throw new AttributeNotExistsException($name);
+        }
+
+        return $this->properties[$name];
+    }
+
 
     public function getExclusionPolicy(): string
     {

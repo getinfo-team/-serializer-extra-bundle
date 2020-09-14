@@ -14,7 +14,9 @@ interface ClassMetadataInterface
     /**
      * @return AttributeMetadataInterface[]
      */
-    public function getProperties(): array;
+    public function getAttributes(): array;
+
+    public function getAttribute(string $name): AttributeMetadataInterface;
 
     public function getExclusionPolicy(): string;
 }
