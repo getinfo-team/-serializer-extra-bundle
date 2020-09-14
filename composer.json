@@ -10,7 +10,8 @@
     ],
     "require": {
         "php": "^7.1",
-        "symfony/serializer-pack": "^1.0"
+        "symfony/serializer-pack": "^1.0",
+        "symfony/polyfill-php80": "^1.18"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^4.0|^5.0"
