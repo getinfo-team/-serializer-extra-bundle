@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GetInfoTeam\SerializerExtraBundle\Exception\Metadata;
+namespace GetInfoTeam\SerializerExtraBundle\Exception\Mapping;
 
 use GetInfoTeam\SerializerExtraBundle\Exception\InvalidArgumentException;
 use Throwable;
