@@ -14,7 +14,13 @@
         "symfony/polyfill-php80": "^1.18"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.0|^5.0"
+        "symfony/phpunit-bridge": "^4.0|^5.0",
+        "doctrine/doctrine-bundle": "^2.0",
+        "symfony/property-info": "^4.0|^5.0"
+    },
+    "suggest": {
+        "doctrine/doctrine-bundle": "To use DoctrineIdentifierConverter",
+        "symfony/property-info": "To use DoctrineIdentifierConverter"
     },
     "autoload": {
         "psr-4": {
