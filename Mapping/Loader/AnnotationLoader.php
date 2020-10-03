@@ -8,14 +8,14 @@ use Doctrine\Common\Annotations\Reader;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Accessor;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Converter;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Exclude;
-use GetInfoTeam\SerializerExtraBundle\Annotation\ExclusionPolicy;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Expose;
+use GetInfoTeam\SerializerExtraBundle\Annotation\ExtraSerialized;
 use GetInfoTeam\SerializerExtraBundle\Annotation\VirtualAttribute;
-use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadata;
+use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\NotExtraSerializedException;
 use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadataBuilder;
 use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadataBuilderInterface;
+use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadataInterface;
 use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataBuilder;
-use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataBuilderInterface;
 use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface;
 use GetInfoTeam\SerializerExtraBundle\Mapping\Factory\ClassResolverTrait;
 use ReflectionClass;
@@ -45,7 +45,18 @@ class AnnotationLoader implements LoaderInterface
         $classRef = new ReflectionClass($class);
         $classMetadataBuilder = ClassMetadataBuilder::create($class);
 
-        $this->resolveClassAnnotations($this->reader->getClassAnnotations($classRef), $classMetadataBuilder);
+        /** @var ExtraSerialized|null $extraSerialized */
+        $extraSerialized = $this->reader->getClassAnnotation($classRef, ExtraSerialized::class);
+
+        if (is_null($extraSerialized)) {
+            throw new NotExtraSerializedException($class);
+        }
+
+        $classMetadataBuilder->setExclusionPolicy($extraSerialized->policy);
+
+        foreach ($extraSerialized->properties as $property) {
+            $classMetadataBuilder->addAttribute($this->resolveVirtualAttributeAnnotation($property));
+        }
 
         foreach ($classRef->getProperties() as $property) {
             $attributeMetadataBuilder = AttributeMetadataBuilder::create($property->getName());
@@ -59,25 +70,17 @@ class AnnotationLoader implements LoaderInterface
         return $classMetadataBuilder->build();
     }
 
-    protected function resolveClassAnnotations(array $annotations, ClassMetadataBuilderInterface $builder): void
+    protected function resolveVirtualAttributeAnnotation(VirtualAttribute $attribute): AttributeMetadataInterface
     {
-        foreach ($annotations as $annotation) {
-            if ($annotation instanceof ExclusionPolicy) {
-                $builder->setExclusionPolicy($annotation->policy);
-            } elseif ($annotation instanceof VirtualAttribute) {
-                $builder->addAttribute(
-                    new AttributeMetadata(
-                        $annotation->name,
-                        $annotation->exclude,
-                        $annotation->expose,
-                        $annotation->getter,
-                        $annotation->setter,
-                        $annotation->converter,
-                        $annotation->options
-                    )
-                );
-            }
-        }
+        return AttributeMetadataBuilder::create($attribute->name)
+            ->setExclude($attribute->exclude)
+            ->setExpose($attribute->expose)
+            ->setGetter($attribute->getter)
+            ->setSetter($attribute->setter)
+            ->setConverter($attribute->converter)
+            ->setOptions($attribute->options)
+            ->build()
+        ;
     }
 
     protected function resolveAttributeAnnotations(array $annotations, AttributeMetadataBuilderInterface $builder): void
