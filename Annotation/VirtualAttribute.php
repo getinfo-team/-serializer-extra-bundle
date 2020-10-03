@@ -6,7 +6,7 @@ namespace GetInfoTeam\SerializerExtraBundle\Annotation;
 
 /**
  * @Annotation
- * @Target("CLASS")
+ * @Target("ANNOTATION")
  */
 class VirtualAttribute
 {
