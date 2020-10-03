@@ -14,12 +14,17 @@ use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface;
 class ExtraSerialized
 {
     /**
-     * @Enum({ClassMetadataInterface::EXCLUSION_POLICY_ALL, ClassMetadataInterface::EXCLUSION_POLICY_NONE})
+     * @Enum({
+     *     GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface::EXCLUSION_POLICY_ALL,
+     *     GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface::EXCLUSION_POLICY_NONE
+     * })
      */
     public $policy = ClassMetadataInterface::EXCLUSION_POLICY_NONE;
 
     /**
-     * @var array<VirtualAttribute>|VirtualAttribute[]
+     * @var array<\GetInfoTeam\SerializerExtraBundle\Annotation\VirtualAttribute>
+     *
+     * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
      */
     public $properties = [];
 }

@@ -10,9 +10,9 @@ namespace GetInfoTeam\SerializerExtraBundle\Annotation;
  */
 class Accessor
 {
-    /** @var string|null */
+    /** @var string */
     public $getter = null;
 
-    /** @var string|null */
+    /** @var string */
     public $setter = null;
 }

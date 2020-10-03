@@ -13,7 +13,7 @@ class VirtualAttribute
     /**
      * @Required
      *
-     * @var string|null
+     * @var string
      */
     public $name = null;
 
@@ -23,13 +23,13 @@ class VirtualAttribute
     /** @var bool */
     public $expose = false;
 
-    /** @var string|null */
+    /** @var string */
     public $getter = null;
 
-    /** @var string|null */
+    /** @var string */
     public $setter = null;
 
-    /** @var string|null */
+    /** @var string */
     public $converter = null;
 
     /** @var array */

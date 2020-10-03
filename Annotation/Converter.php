@@ -10,7 +10,7 @@ namespace GetInfoTeam\SerializerExtraBundle\Annotation;
  */
 class Converter
 {
-    /** @var string|null */
+    /** @var string */
     public $converter = null;
 
     /** @var array */
