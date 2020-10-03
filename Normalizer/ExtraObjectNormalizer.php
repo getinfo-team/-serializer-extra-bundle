@@ -6,6 +6,7 @@ namespace GetInfoTeam\SerializerExtraBundle\Normalizer;
 
 use GetInfoTeam\SerializerExtraBundle\Converter\ConverterContainerInterface;
 use GetInfoTeam\SerializerExtraBundle\Exception\LogicException;
+use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\NotExtraSerializedException;
 use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadataInterface;
 use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface;
 use ReflectionException;
@@ -53,6 +54,28 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
         $this->classMetadataFactory = $extraClassMetadataFactory;
         $this->converterContainer = $converterContainer;
         $this->accessor = $accessor ?: PropertyAccess::createPropertyAccessor();
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        try {
+            $this->classMetadataFactory->getMetadataFor($data);
+        } catch (NotExtraSerializedException $e) {
+            return false;
+        }
+
+        return parent::supportsNormalization($data, $format);
+    }
+
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        try {
+            $this->classMetadataFactory->getMetadataFor($type);
+        } catch (NotExtraSerializedException $e) {
+            return false;
+        }
+
+        return parent::supportsDenormalization($data, $type, $format);
     }
 
     protected function extractAttributes($object, $format = null, array $context = [])
