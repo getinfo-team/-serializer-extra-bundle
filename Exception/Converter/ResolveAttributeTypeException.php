@@ -13,6 +13,6 @@ class ResolveAttributeTypeException extends LogicException
 
     public function __construct(string $class, string $attribute, $code = 0, Throwable $previous = null)
     {
-        parent::__construct(sprintf(static::MESSAGE. $class, $attribute), $code, $previous);
+        parent::__construct(sprintf(static::MESSAGE, $class, $attribute), $code, $previous);
     }
 }
