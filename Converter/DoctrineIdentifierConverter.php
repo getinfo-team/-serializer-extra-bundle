@@ -26,7 +26,7 @@ if (
 
         const DEFAULT_NAME = 'extra_serializer.doctrine.id';
 
-        const DEFAULT_ERROR_MESSAGE = 'Not found.';
+        const DEFAULT_ERROR_MESSAGE = 'Entity with identifier "%s" not found.';
 
         const DEFAULT_COLLECTION_ERROR_MESSAGE = 'Entities with identifiers %s not found.';
 
@@ -61,6 +61,10 @@ if (
             $class = $this->getClass($object);
             $type = $this->getType($class, $attribute);
 
+            if ($type->isNullable() && is_null($value)) {
+                return null;
+            }
+
             $metadata = $this->getClassMetadata($type);
 
             if ($type->isCollection()) {
@@ -84,7 +88,9 @@ if (
             $class = $this->getClass($object);
             $type = $this->getType($class, $attribute);
 
-            $repository = $this->getRepository($type);
+            if ($type->isNullable() && is_null($value)) {
+                return null;
+            }
 
             if ($type->isCollection()) {
                 if (!is_iterable($value)) {
@@ -94,7 +100,7 @@ if (
                 $metadata = $this->getClassMetadata($type);
                 $idField = $this->getIdentifierField($metadata);
 
-                $result = array_values($repository->findBy([$idField => $value]));
+                $result = array_values($this->getRepository($type)->findBy([$idField => $value]));
 
                 if (count($value) !== count($result)) {
                     $notFoundIds = array_diff(
@@ -117,11 +123,12 @@ if (
 
                 return $result;
             } else {
-                $result = $repository->find($value);
+                $result = $this->getRepository($type)->find($value);
 
                 if (is_null($result)) {
-                    $errorMessage = $options[static::OPTION_ERROR_MESSAGE] ?? static::DEFAULT_ERROR_MESSAGE;
-                    throw new EntityNotFoundException($errorMessage);
+                    throw new EntityNotFoundException(
+                        sprintf($options[static::OPTION_ERROR_MESSAGE] ?? static::DEFAULT_ERROR_MESSAGE, $value)
+                    );
                 }
 
                 return $result;
@@ -132,7 +139,7 @@ if (
         {
             $types = $this->propertyTypeExtractor->getTypes($class, $attribute);
 
-            if (!$types || count($types) > 0) {
+            if (!$types || count($types) > 1) {
                 throw new ResolveAttributeTypeException($class, $attribute);
             }
 
