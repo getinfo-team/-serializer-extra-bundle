@@ -23,7 +23,7 @@ use GetInfoTeam\SerializerExtraBundle\Mapping\Factory\ClassMetadataFactoryInterf
 class ExtraObjectNormalizer extends AbstractObjectNormalizer
 {
     /** @var ExtraClassMetadataFactoryInterface */
-    private $classMetadataFactory;
+    private $extraClassMetadataFactory;
 
     /** @var ConverterContainerInterface */
     private $converterContainer;
@@ -51,31 +51,39 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
             $defaultContext
         );
 
-        $this->classMetadataFactory = $extraClassMetadataFactory;
+        $this->extraClassMetadataFactory = $extraClassMetadataFactory;
         $this->converterContainer = $converterContainer;
         $this->accessor = $accessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     public function supportsNormalization($data, $format = null)
     {
-        try {
-            $this->classMetadataFactory->getMetadataFor($data);
-        } catch (NotExtraSerializedException $e) {
+        if (!parent::supportsNormalization($data, $format)) {
             return false;
         }
 
-        return parent::supportsNormalization($data, $format);
+        try {
+            $this->extraClassMetadataFactory->getMetadataFor($data);
+
+            return true;
+        } catch (NotExtraSerializedException $e) {
+            return false;
+        }
     }
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        try {
-            $this->classMetadataFactory->getMetadataFor($type);
-        } catch (NotExtraSerializedException $e) {
+        if (!parent::supportsDenormalization($data, $type, $format)) {
             return false;
         }
 
-        return parent::supportsDenormalization($data, $type, $format);
+        try {
+            $this->extraClassMetadataFactory->getMetadataFor($type);
+
+            return true;
+        } catch (NotExtraSerializedException $e) {
+            return false;
+        }
     }
 
     protected function extractAttributes($object, $format = null, array $context = [])
@@ -85,7 +93,7 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
                 return $attr->getName();
             },
             array_filter(
-                $this->classMetadataFactory->getMetadataFor($object)->getAttributes(),
+                $this->extraClassMetadataFactory->getMetadataFor($object)->getAttributes(),
                 function(AttributeMetadataInterface $attr) use ($object) {
                     return $this->accessor->isReadable($object, $attr->getName());
                 }
@@ -95,7 +103,7 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
-        $metadata = $this->classMetadataFactory->getMetadataFor($classOrObject);
+        $metadata = $this->extraClassMetadataFactory->getMetadataFor($classOrObject);
 
         switch ($metadata->getExclusionPolicy()) {
             case ClassMetadataInterface::EXCLUSION_POLICY_ALL:
@@ -123,7 +131,7 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
-        $metadata = $this->classMetadataFactory->getMetadataFor($object)->getAttribute($attribute);
+        $metadata = $this->extraClassMetadataFactory->getMetadataFor($object)->getAttribute($attribute);
 
         if ($metadata->getter()) {
             $getter = new ReflectionMethod($object, $metadata->getter());
@@ -171,7 +179,7 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
-        $metadata = $this->classMetadataFactory->getMetadataFor($object)->getAttribute($attribute);
+        $metadata = $this->extraClassMetadataFactory->getMetadataFor($object)->getAttribute($attribute);
 
         if ($metadata->getConverter()) {
             $converter = $this->converterContainer->get($metadata->getConverter());
