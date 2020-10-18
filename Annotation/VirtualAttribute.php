@@ -18,10 +18,10 @@ class VirtualAttribute
     public $name = null;
 
     /** @var bool */
-    public $exclude = false;
+    public $exclude = null;
 
     /** @var bool */
-    public $expose = false;
+    public $expose = null;
 
     /** @var string */
     public $getter = null;
@@ -33,5 +33,5 @@ class VirtualAttribute
     public $converter = null;
 
     /** @var array */
-    public $options = [];
+    public $options = null;
 }
