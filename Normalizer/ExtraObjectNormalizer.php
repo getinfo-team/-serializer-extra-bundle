@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GetInfoTeam\SerializerExtraBundle\Normalizer;
 
 use GetInfoTeam\SerializerExtraBundle\Converter\ConverterContainerInterface;
-use GetInfoTeam\SerializerExtraBundle\Exception\LogicException;
 use GetInfoTeam\SerializerExtraBundle\Exception\Mapping\NotExtraSerializedException;
 use GetInfoTeam\SerializerExtraBundle\Mapping\AttributeMetadataInterface;
 use GetInfoTeam\SerializerExtraBundle\Mapping\ClassMetadataInterface;
@@ -14,6 +13,7 @@ use ReflectionMethod;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -89,13 +89,13 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
     protected function extractAttributes($object, $format = null, array $context = [])
     {
         return array_map(
-            function(AttributeMetadataInterface $attr) {
-                return $attr->getName();
+            function(AttributeMetadataInterface $metadata) {
+                return $metadata->getName();
             },
             array_filter(
                 $this->extraClassMetadataFactory->getMetadataFor($object)->getAttributes(),
-                function(AttributeMetadataInterface $attr) use ($object) {
-                    return $this->accessor->isReadable($object, $attr->getName());
+                function (AttributeMetadataInterface $metadata) use (&$object, &$format, &$context) {
+                    return $this->isAllowedAttribute($object, $metadata->getName(), $format, $context);
                 }
             )
         );
@@ -103,14 +103,21 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
-        $metadata = $this->extraClassMetadataFactory->getMetadataFor($classOrObject);
+        $classMetadata = $this->extraClassMetadataFactory->getMetadataFor($classOrObject);
+        $attributeMetadata = $classMetadata->getAttribute($attribute);
 
-        switch ($metadata->getExclusionPolicy()) {
-            case ClassMetadataInterface::EXCLUSION_POLICY_ALL:
-                return $metadata->getAttribute($attribute)->isExpose();
+        if (
+            $classMetadata->getExclusionPolicy() === ClassMetadataInterface::EXCLUSION_POLICY_NONE &&
+            $attributeMetadata->isExclude()
+        ) {
+            return false;
+        }
 
-            case ClassMetadataInterface::EXCLUSION_POLICY_NONE:
-                return !$metadata->getAttribute($attribute)->isExclude();
+        if (
+            $classMetadata->getExclusionPolicy() === ClassMetadataInterface::EXCLUSION_POLICY_ALL &&
+            ! $attributeMetadata->isExpose()
+        ) {
+            return false;
         }
 
         return parent::isAllowedAttribute(
@@ -133,11 +140,13 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
     {
         $metadata = $this->extraClassMetadataFactory->getMetadataFor($object)->getAttribute($attribute);
 
+        $value = null;
+
         if ($metadata->getter()) {
             $getter = new ReflectionMethod($object, $metadata->getter());
 
             if (0 !== $getter->getNumberOfRequiredParameters()) {
-                throw new LogicException(sprintf('Getter of attribute "%s" has required parameters.', $attribute));
+                throw new LogicException(sprintf('Getter of attribute "%s" has required arguments.', $attribute));
             }
 
             if (!$getter->isPublic()) {
@@ -158,7 +167,9 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
 
             $value = $getter->invoke($object);
         } else {
-            $value = $this->accessor->getValue($object, $attribute);
+            if ($this->accessor->isReadable($object, $attribute)) {
+                $value = $this->accessor->getValue($object, $attribute);
+            }
         }
 
         if ($metadata->getConverter()) {
@@ -190,7 +201,7 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
             $setter = new ReflectionMethod($object, $metadata->setter());
 
             if (1 !== $setter->getNumberOfParameters()) {
-                throw new LogicException(sprintf('Setter of attribute "%s" must have 1 parameter.', $attribute));
+                throw new LogicException(sprintf('Setter of attribute "%s" must have 1 argument.', $attribute));
             }
 
             if (!$setter->isPublic()) {
@@ -199,14 +210,6 @@ class ExtraObjectNormalizer extends AbstractObjectNormalizer
 
             if ($setter->isStatic()) {
                 throw new LogicException(sprintf('Setter of attribute "%s" is static.', $attribute));
-            }
-
-            if ($setter->isConstructor()) {
-                throw new LogicException(sprintf('Setter of attribute "%s" is constructor.', $attribute));
-            }
-
-            if ($setter->isDestructor()) {
-                throw new LogicException(sprintf('Setter of attribute "%s" is destructor.', $attribute));
             }
 
             $setter->invoke($object, $value);
