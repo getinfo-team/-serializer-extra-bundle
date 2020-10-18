@@ -32,6 +32,14 @@ class ExtraObjectNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization('scalar'));
     }
 
+    public function testSupportsDenormalization()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization([], ExcludeEntity::class));
+        $this->assertTrue($this->normalizer->supportsDenormalization([], ExposeEntity::class));
+        $this->assertFalse($this->normalizer->supportsDenormalization([], stdClass::class));
+        $this->assertFalse($this->normalizer->supportsDenormalization('123','int'));
+    }
+
     protected function setUp(): void
     {
         /** @var ConverterInterface|MockObject $converter */
