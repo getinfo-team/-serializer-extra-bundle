@@ -17,5 +17,5 @@ use GetInfoTeam\SerializerExtraBundle\Annotation\VirtualAttribute;
  */
 class ExcludeEntity extends ParentEntity
 {
-    public $foo = 'Foo';
+    public $foo;
 }

@@ -11,12 +11,12 @@ use GetInfoTeam\SerializerExtraBundle\Annotation\VirtualAttribute;
  * @ExtraSerialized(
  *     policy="ALL",
  *     properties={
- *         @VirtualAttribute(name="privateProperty"),
- *         @VirtualAttribute(name="virtual", getter="getVirtualProperty")
+ *         @VirtualAttribute(name="privateProperty", expose=true),
+ *         @VirtualAttribute(name="virtual", getter="getVirtualProperty", expose=true)
  *     }
  * )
  */
 class ExposeEntity extends ParentEntity
 {
-    public $foo = 'Foo';
+    public $foo;
 }

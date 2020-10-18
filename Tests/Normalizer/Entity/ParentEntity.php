@@ -8,14 +8,15 @@ use GetInfoTeam\SerializerExtraBundle\Annotation\Accessor;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Converter;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Exclude;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Expose;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class ParentEntity
 {
-    public $simple = 'Simple';
+    public $simple;
 
     /**
-     * @Converter(converter="test_converter")
+     * @Converter(converter="testConverter")
      *
      * @var AssociatedEntity
      */
@@ -24,45 +25,51 @@ class ParentEntity
     /**
      * @Exclude()
      */
-    public $excluded = 'Excluded';
+    public $excluded;
 
     /**
      * @Expose()
      */
-    public $exposed = 'Exposed';
+    public $exposed;
 
     /**
-     * @Accessor(getter="getPublicProperty", setter="setPublicProperty")
+     * @Accessor(getter="_getPublicProperty", setter="_setPublicProperty")
+     *
+     * @Groups({"group"})
      */
     protected $accessor;
 
     /**
-     * @Accessor(getter="getMultiple", setter="setMultiple")
-     * @Converter("test_converter")
+     * @Accessor(getter="_getMultiple", setter="_setMultiple")
+     * @Converter("testConverter")
+     *
      * @SerializedName("multiple")
      *
      * @var AssociatedEntity
      */
     protected $multipleAnnotation;
 
-    private $privateProperty = 'Private';
+    /**
+     * @Groups({"group"})
+     */
+    private $privateProperty;
 
-    public function getPublicProperty()
+    public function _getPublicProperty()
     {
         return $this->accessor;
     }
 
-    public function setPublicProperty($publicPropertyAccessor)
+    public function _setPublicProperty($publicPropertyAccessor)
     {
         $this->accessor = $publicPropertyAccessor;
     }
 
-    public function getMultiple()
+    public function _getMultiple()
     {
         return $this->multipleAnnotation;
     }
 
-    public function setMultiple($value)
+    public function _setMultiple($value)
     {
         $this->multipleAnnotation = $value;
     }
@@ -79,6 +86,6 @@ class ParentEntity
 
     public function getVirtualProperty()
     {
-        return 'Virtual property';
+        return 'VirtualProperty';
     }
 }
