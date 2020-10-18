@@ -26,7 +26,7 @@ class AnnotationLoaderTest extends TestCase
 
         $this->assertSame(AnnotationEntity::class, $metadata->getClass());
         $this->assertSame(ClassMetadataInterface::EXCLUSION_POLICY_NONE, $metadata->getExclusionPolicy());
-        $this->assertCount(5, $metadata->getAttributes());
+        $this->assertCount(6, $metadata->getAttributes());
 
         $this->assertAttribute($metadata->getAttribute('virtual'), 'virtual', false, false, 'virtual');
         $this->assertAttribute($metadata->getAttribute('foo'), 'foo', false, true);
@@ -42,6 +42,24 @@ class AnnotationLoaderTest extends TestCase
         );
         $this->assertAttribute($metadata->getAttribute('baz'), 'baz', false, false, 'baz', 'setBaz');
         $this->assertAttribute($metadata->getAttribute('exclude'), 'exclude', true);
+        $this->assertAttribute(
+            $metadata->getAttribute('parent'),
+            'parent',
+            false,
+            true,
+            'getParent',
+            'setParent',
+            'testConverter',
+            ['foo' => 123]
+        );
+
+        $parentMetadata = $this->loader->load(AnnotationEntityParent::class);
+
+        $this->assertSame(AnnotationEntityParent::class, $parentMetadata->getClass());
+        $this->assertSame(ClassMetadataInterface::EXCLUSION_POLICY_ALL, $parentMetadata->getExclusionPolicy());
+        $this->assertCount(1, $parentMetadata->getAttributes());
+
+        $this->assertAttribute($parentMetadata->getAttribute('parent'), 'parent', true);
     }
 
     /**

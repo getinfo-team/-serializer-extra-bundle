@@ -14,11 +14,12 @@ use GetInfoTeam\SerializerExtraBundle\Annotation\VirtualAttribute;
 /**
  * @ExtraSerialized(
  *     properties={
- *         @VirtualAttribute(name="virtual", getter="virtual")
+ *         @VirtualAttribute(name="virtual", getter="virtual"),
+ *         @VirtualAttribute(name="parent", getter="getParent", setter="setParent", exclude=false, expose=true, converter="testConverter", options={"foo": 123})
  *     }
  * )
  */
-class AnnotationEntity
+class AnnotationEntity extends AnnotationEntityParent
 {
     /**
      * @Expose()
