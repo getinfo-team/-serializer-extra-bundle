@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Metadata Loader -->
+        <service id="GetInfoTeam\SerializerExtraBundle\Mapping\Loader\AnnotationLoader">
+            <argument type="service" id="annotations.reader"/>
+        </service>
+
+        <service id="GetInfoTeam\SerializerExtraBundle\Mapping\Loader\LoaderInterface"
+                 alias="GetInfoTeam\SerializerExtraBundle\Mapping\Loader\AnnotationLoader"/>
+        <!-- END Metadata Loader -->
+
+        <!-- Metadata Factory -->
+        <service id="GetInfoTeam\SerializerExtraBundle\Mapping\Factory\ClassMetadataFactory">
+            <argument type="service" id="GetInfoTeam\SerializerExtraBundle\Mapping\Loader\LoaderInterface"/>
+        </service>
+        <!-- END Metadata Factory -->
+
+        <!-- ConverterContainerInterface -->
+        <service id="GetInfoTeam\SerializerExtraBundle\Converter\ConverterContainer">
+            <argument type="tagged_iterator" tag="serializer_extra.converter"/>
+        </service>
+        <!-- END ConverterContainerInterface -->
+
+        <!-- ExtraObjectNormalizer -->
+        <service id="GetInfoTeam\SerializerExtraBundle\Normalizer\ExtraObjectNormalizer">
+            <argument type="service" id="GetInfoTeam\SerializerExtraBundle\Mapping\Factory\ClassMetadataFactory"/>
+            <argument type="service" id="GetInfoTeam\SerializerExtraBundle\Converter\ConverterContainer"/>
+            <argument type="service" id="serializer.mapping.class_metadata_factory"/>
+            <argument type="service" id="property_accessor"/>
+            <argument type="service" id="serializer.name_converter.metadata_aware"/>
+            <argument type="service" id="property_info"/>
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore"/>
+            <argument>null</argument>
+            <argument type="collection" />
+
+            <tag name="serializer.normalizer" priority="-700" />
+        </service>
+        <!-- END ExtraObjectNormalizer -->
+    </services>
+</container>
