@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 class ExtraObjectNormalizerTest extends TestCase
 {
@@ -56,7 +55,7 @@ class ExtraObjectNormalizerTest extends TestCase
                 'converter' => 'converter',
                 'exposed' => 'Exposed',
                 'accessor' => 'AccessorValue',
-                'multiple' => 'multiple',
+                'multipleAnnotation' => 'multiple',
                 'privateProperty' => 'Private',
                 'virtual' => 'VirtualProperty'
             ],
@@ -106,7 +105,7 @@ class ExtraObjectNormalizerTest extends TestCase
             [
                 'foo' => 'Foo',
                 'simple' => 'Simple',
-                'multiple' => 'multiple',
+                'multipleAnnotation' => 'multiple',
                 'virtual' => 'VirtualProperty'
             ],
             $this->normalizer->normalize(
@@ -509,7 +508,7 @@ class ExtraObjectNormalizerTest extends TestCase
             new ConverterContainer([$converter]),
             $metadataFactory,
             null,
-            new MetadataAwareNameConverter($metadataFactory)
+            null
         );
     }
 
@@ -538,7 +537,7 @@ class ExtraObjectNormalizerTest extends TestCase
             'excluded' => 'Excluded',
             'exposed' => 'Exposed',
             'accessor' => 'AccessorValue',
-            'multiple' => 'multiple',
+            'multipleAnnotation' => 'multiple',
             'privateProperty' => 'Private'
         ];
     }

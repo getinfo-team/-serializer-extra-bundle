@@ -9,7 +9,6 @@ use GetInfoTeam\SerializerExtraBundle\Annotation\Converter;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Exclude;
 use GetInfoTeam\SerializerExtraBundle\Annotation\Expose;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class ParentEntity
 {
@@ -42,8 +41,6 @@ class ParentEntity
     /**
      * @Accessor(getter="_getMultiple", setter="_setMultiple")
      * @Converter("testConverter")
-     *
-     * @SerializedName("multiple")
      *
      * @var AssociatedEntity
      */
