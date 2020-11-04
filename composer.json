@@ -12,10 +12,10 @@
         "php": "^7.1",
         "symfony/serializer-pack": "^1.0",
         "symfony/polyfill-php80": "^1.18",
-        "symfony/serializer": "^4.2|^5.0"
+        "symfony/serializer": "^4.2"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.0|^5.0",
+        "symfony/phpunit-bridge": "^4.0",
         "doctrine/doctrine-bundle": "^2.0"
     },
     "suggest": {
