@@ -1,0 +1,38 @@
+{
+    "name": "getinfo-team/serializer-extra-bundle",
+    "type": "symfony-pack",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kenny1911",
+            "email": "o-muzyka@mail.ru"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "symfony/serializer-pack": "^1.0",
+        "symfony/polyfill-php80": "^1.18",
+        "symfony/serializer": "^4.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^4.0",
+        "doctrine/doctrine-bundle": "^2.0"
+    },
+    "suggest": {
+        "doctrine/doctrine-bundle": "To use DoctrineIdentifierConverter"
+    },
+    "autoload": {
+        "psr-4": {
+            "GetInfoTeam\\SerializerExtraBundle\\": "./"
+        },
+        "exclude-from-classmap": ["./Tests"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GetInfoTeam\\SerializerExtraBundle\\Tests\\": "./Tests"
+        }
+    },
+    "scripts": {
+        "phpunit": "simple-phpunit"
+    }
+}
